@@ -1,37 +1,61 @@
-<?php
-$A=$_POST['User_Name'];
-$B=$_POST['User_Pass'];
+<!-- <?php
 $servername = "localhost";
-$username = "root";//username of your device
-$password = "krish@123";//password on mysql
-$dbname = "student_pbl";//database name
-$conn="";
+$username = "root";
+$password = "";
+$dbname = "lab_4";
 
-$conn = mysqli_connect($servername, $username, $password, $dbname);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-// if ($conn->connect_error) {
-//     die("Connection failed: ".$conn->connect_error);
-// }
-// echo "Connected successfully"."<br>";
-
-
-// $sql="CREATE DATABASE test2";
-// $sql="CREATE TABLE USERS (U_ID int,U_name varchar(10))";
-
-$sql="use student_pbl";
-$sql="select * from stud where username=$a and password=$b";
-
-
-// $sql="INSERT INTO USERS values('$A','$B')";
-if($conn->query($sql)==TRUE){
-    // echo "Database created succesfully";
-    // echo "Table created succesfully";
-    // echo "Values inserted succesfully";
-
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-// else{
-//     echo "\nSome error in database creation".$conn->error;
-// }
 
+$sql = "SELECT * FROM stud";
+$result = $conn->query($sql);
+
+?> -->
+
+
+<?php
+session_start();
+$servername = "localhost";
+$username = "root";
+$password = "--";
+$dbname = "student_pbl";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    
+    // You should use prepared statements and password hashing in production
+    $sql = "SELECT * FROM stud WHERE username = '$username' AND password = '$password'";
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['name'] = $row['name'];
+        $_SESSION['prn'] = $row['prn'];
+        $_SESSION['roll'] = $row['roll'];
+        $_SESSION['year'] = $row['year'];
+        $_SESSION['course'] = $row['course'];
+        
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        header("Location: login.html?error=1");
+        exit();
+    }
+}
 $conn->close();
 ?>
